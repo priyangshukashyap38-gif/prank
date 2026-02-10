@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Account Verification Portal</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #fafafa;
+            color: #262626;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        .warning-bar {
+            background-color: #fff3cd;
+            border-bottom: 1px solid #ffeaa7;
+            padding: 8px 16px;
+            font-size: 13px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .warning-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #856404;
+        }
+        
+        .warning-icon {
+            font-size: 14px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: white;
+            border-bottom: 1px solid #dbdbdb;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #262626;
+        }
+        
+        .subtitle {
+            color: #8e8e8e;
+            font-size: 15px;
+            font-weight: normal;
+        }
+        
+        .verified-badge {
+            color: #0095f6;
+            font-size: 20px;
+            margin-left: 5px;
+        }
+        
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex-grow: 1;
+        }
+        
+        .level-card {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #efefef;
+        }
+        
+        .level-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .level-number {
+            background-color: #0095f6;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fafafa;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #a8a8a8;
+        }
+        
+        .btn {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background-color: #0074cc;
+        }
+        
+        .btn:disabled {
+            background-color: #b2dffc;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background-color: #efefef;
+            color: #262626;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #dbdbdb;
+        }
+        
+        .progress-container {
+            margin-top: 25px;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #8e8e8e;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #efefef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #0095f6;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .fake-loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #8e8e8e;
+            font-size: 14px;
+        }
+        
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #0095f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .attention-test {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #efefef;
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+        }
+        
+        .hidden-detail {
+            color: #fafafa;
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .hidden-detail:hover {
+            color: #0095f6;
+        }
+        
+        .username-check {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .username-check input {
+            flex-grow: 1;
+        }
+        
+        .username-check button {
+            width: auto;
+            white-space: nowrap;
+        }
+        
+        .username-feedback {
+            margin-top: 10px;
+            font-size: 13px;
+            min-height: 18px;
+        }
+        
+        .username-error {
+            color: #ed4956;
+        }
+        
+        .username-success {
+            color: #1a9e2d;
+        }
+        
+        .behavior-test {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .behavior-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .behavior-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .behavior-timer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #8e8e8e;
+        }
+        
+        .final-loading {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .final-progress {
+            width: 100%;
+            height: 10px;
+            background-color: #efefef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+        
+        .final-progress-fill {
+            height: 100%;
+            background-color: #0095f6;
+            width: 99%;
+            border-radius: 5px;
+        }
+        
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+        
+        .status-message {
+            font-size: 13px;
+            color: #8e8e8e;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #8e8e8e;
+            font-size: 12px;
+            border-top: 1px solid #dbdbdb;
+            background-color: white;
+            margin-top: auto;
+        }
+        
+        .cheat-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .cheat-message {
+            text-align: center;
+            font-size: 24px;
+            color: #ed4956;
+            font-weight: 600;
+        }
+        
+        .session-sync {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0095f6;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+            z-index: 100;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .level-card {
+                padding: 20px;
+            }
+            
+            .warning-bar {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Anti-cheat screen (shown when user tries to cheat) -->
+    <div class="cheat-screen" id="cheatScreen">
+        <div class="cheat-message">
+            Access Revoked<br>
+            <span style="font-size: 18px; margin-top: 10px; display: block;">Reason: Integrity violation</span>
+            <span style="font-size: 14px; margin-top: 20px; display: block; font-weight: normal;">Contact administrator (Priyangshu)</span>
+        </div>
+    </div>
+    
+    <!-- Global warnings -->
+    <div class="warning-bar">
+        <div class="warning-item">
+            <span class="warning-icon">⚠️</span>
+            <span>Do not refresh the page.</span>
+        </div>
+        <div class="warning-item">
+            <span class="warning-icon">⚠️</span>
+            <span>Do not use back button.</span>
+        </div>
+        <div class="warning-item">
+            <span class="warning-icon">⚠️</span>
+            <span>Suspicious activity will terminate the verification process.</span>
+        </div>
+    </div>
+    
+    <header>
+        <h1>priyangshu IG ban <span class="verified-badge">✔</span></h1>
+        <p class="subtitle">Official Instagram Account Registration Verification Portal</p>
+    </header>
+    
+    <div class="container">
+        <!-- Level 1: Basic Info Validation -->
+        <div class="level-card" id="level1">
+            <div class="level-header">
+                <div class="level-title">Basic Information Validation</div>
+                <div class="level-number">1</div>
+            </div>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email address">
+            </div>
+            <div class="form-group">
+                <label for="purpose">Purpose of Second Account</label>
+                <select id="purpose">
+                    <option value="">Select a purpose</option>
+                    <option value="business">Business</option>
+                    <option value="personal">Personal</option>
+                    <option value="creator">Content Creator</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <button class="btn" id="level1Btn">Continue to Verification</button>
+        </div>
+        
+        <!-- Level 2: Knowledge Check -->
+        <div class="level-card" id="level2" style="display: none;">
+            <div class="level-header">
+                <div class="level-title">Instagram Policy Knowledge Check</div>
+                <div class="level-number">2</div>
+            </div>
+            <div class="form-group">
+                <label for="question">What is the minimum age requirement to use Instagram?</label>
+                <input type="text" id="question" placeholder="Enter your answer">
+            </div>
+            <div class="success-message" id="level2Success">
+                ✓ Policy knowledge verified. You may proceed.
+            </div>
+            <button class="btn" id="level2Btn">Verify Answer</button>
+        </div>
+        
+        <!-- Level 3: Visual Attention Test -->
+        <div class="level-card" id="level3" style="display: none;">
+            <div class="level-header">
+                <div class="level-title">Visual Attention Test</div>
+                <div class="level-number">3</div>
+            </div>
+            <p style="margin-bottom: 15px; font-size: 14px;">Please read the following text carefully:</p>
+            <div class="attention-test">
+                Instagram's verification process ensures that accounts are authentic, unique, and notable. 
+                To maintain platform integrity, we require users to complete several verification steps. 
+                This helps us confirm your identity and prevent impersonation. Please note that sharing 
+                your login credentials with third-party applications violates our terms of service. 
+                <span class="hidden-detail" id="hiddenDetail">CONTINUE</span>
+            </div>
+            <p style="font-size: 14px; margin-bottom: 15px;">Click the hidden word in the text above to continue.</p>
+            <div class="success-message" id="level3Success">
+                ✓ Visual attention verified. You may proceed.
+            </div>
+        </div>
+        
+        <!-- Level 4: Logic Compliance -->
+        <div class="level-card" id="level4" style="display: none;">
+            <div class="level-header">
+                <div class="level-title">Logic Compliance Test</div>
+                <div class="level-number">4</div>
+            </div>
+            <p style="margin-bottom: 15px; font-size: 14px;">Click the button only when it turns GREEN and is NOT disabled.</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <button class="btn" id="logicBtn" style="width: 200px; margin: 0 auto;">Click when ready</button>
+            </div>
+            <div class="success-message" id="level4Success">
+                ✓ Logic compliance verified. You may proceed.
+            </div>
+        </div>
+        
+        <!-- Level 5: Username Availability Scan -->
+        <div class="level-card" id="level5" style="display: none;">
+            <div class="level-header">
+                <div class="level-title">Username Availability Scan</div>
+                <div class="level-number">5</div>
+            </div>
+            <p style="margin-bottom: 15px; font-size: 14px;">Check availability for your desired username:</p>
+            <div class="username-check">
+                <input type="text" id="username" placeholder="Enter desired username">
+                <button class="btn" id="checkUsernameBtn" style="width: auto;">Check</button>
+            </div>
+            <div class="username-feedback" id="usernameFeedback"></div>
+            <div class="success-message" id="level5Success" style="display: none;">
+                ✓ Username available! Please proceed.
+            </div>
+            <button class="btn" id="level5Btn" style="display: none;">Continue to Next Step</button>
+        </div>
+        
+        <!-- Level 6: Human Behavior Analysis -->
+        <div class="level-card" id="level6" style="display: none;">
+            <div class="level-header">
+                <div class="level-title">Human Behavior Analysis</div>
+                <div class="level-number">6</div>
+            </div>
+            <div class="behavior-test">
+                <p style="margin-bottom: 20px; font-size: 14px;">Click the button at the exact right moment. Wait for the signal.</p>
+                <button class="behavior-btn" id="behaviorBtn">Click Now</button>
+                <div class="behavior-timer" id="behaviorTimer">Analyzing readiness... Please wait</div>
+            </div>
+            <div class="success-message" id="level6Success" style="display: none;">
+                ✓ Human behavior verified. Proceeding to final step.
+            </div>
+        </div>
+        
+        <!-- Level 7: Final Eligibility Lock (Impossible) -->
+        <div class="level-card" id="level7" style="display: none;">
+            <div class="level-header">
+                <div class="level-title">Final Eligibility Verification</div>
+                <div class="level-number">7</div>
+            </div>
+            <div class="final-loading">
+                <div class="loader"></div>
+                <p style="margin-top: 15px; font-size: 15px;">Finalizing verification... This may take a few minutes.</p>
+                <div class="final-progress">
+                    <div class="final-progress-fill pulsing"></div>
+                </div>
+                <p id="loadingText">Checking account eligibility...</p>
+                <div class="status-message" id="statusMessage">Session synced with Instagram servers</div>
+            </div>
+        </div>
+        
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-text">
+                <span>Verification Progress</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <!-- Fake loader (shown between levels) -->
+        <div class="fake-loader" id="fakeLoader">
+            <div class="loader"></div>
+            <p>Verifying... Please wait</p>
+        </div>
+        
+        <!-- Session sync notification -->
+        <div class="session-sync" id="sessionSync">Session synced ✓</div>
+    </div>
+    
+    <footer>
+        © 2026 priyangshu IG ban. All rights reserved.
+    </footer>
+
+    <script>
+        // Anti-cheat system
+        let cheatDetected = false;
+        
+        // Detect refresh attempt
+        window.addEventListener('beforeunload', function(e) {
+            if (!cheatDetected) {
+                e.preventDefault();
+                e.returnValue = 'Refreshing the page will terminate the verification process. Are you sure?';
+            }
+        });
+        
+        // Detect back button
+        window.addEventListener('popstate', function(e) {
+            if (!cheatDetected) {
+                showCheatScreen();
+            }
+        });
+        
+        // Disable right-click and inspect
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            showCheatScreen();
+        });
+        
+        // Detect keyboard shortcuts for dev tools
+        document.addEventListener('keydown', function(e) {
+            // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+            if (e.keyCode === 123 || 
+                (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) ||
+                (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+                showCheatScreen();
+            }
+        });
+        
+        // Show cheat screen function
+        function showCheatScreen() {
+            cheatDetected = true;
+            document.getElementById('cheatScreen').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Current level tracking
+        let currentLevel = 1;
+        const totalLevels = 7;
+        
+        // Progress update function
+        function updateProgress(level) {
+            const percent = Math.min((level - 1) / totalLevels * 100, 99);
+            document.getElementById('progressPercent').textContent = Math.round(percent) + '%';
+            document.getElementById('progressFill').style.width = percent + '%';
+            
+            // Show session sync notification randomly
+            if (Math.random() > 0.7) {
+                const sync = document.getElementById('sessionSync');
+                sync.style.display = 'block';
+                setTimeout(() => {
+                    sync.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        // Show fake loader between levels
+        function showLoader() {
+            const loader = document.getElementById('fakeLoader');
+            loader.style.display = 'block';
+            
+            setTimeout(() => {
+                loader.style.display = 'none';
+                showLevel(currentLevel);
+            }, 1500 + Math.random() * 1000);
+        }
+        
+        // Show specific level
+        function showLevel(level) {
+            // Hide all levels
+            for (let i = 1; i <= totalLevels; i++) {
+                document.getElementById('level' + i).style.display = 'none';
+            }
+            
+            // Show the current level
+            document.getElementById('level' + level).style.display = 'block';
+            updateProgress(level);
+        }
+        
+        // Level 1: Basic Info Validation (always succeeds)
+        document.getElementById('level1Btn').addEventListener('click', function() {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const purpose = document.getElementById('purpose').value;
+            
+            if (name && email && purpose) {
+                currentLevel = 2;
+                showLoader();
+            } else {
+                alert('Please fill in all fields to continue.');
+            }
+        });
+        
+        // Level 2: Knowledge Check (always succeeds)
+        document.getElementById('level2Btn').addEventListener('click', function() {
+            const answer = document.getElementById('question').value.trim();
+            
+            // Show success message
+            const successMsg = document.getElementById('level2Success');
+            successMsg.style.display = 'block';
+            
+            // Move to next level after delay
+            setTimeout(() => {
+                currentLevel = 3;
+                showLoader();
+            }, 1500);
+        });
+        
+        // Level 3: Visual Attention Test
+        document.getElementById('hiddenDetail').addEventListener('click', function() {
+            // Show success message
+            const successMsg = document.getElementById('level3Success');
+            successMsg.style.display = 'block';
+            
+            // Move to next level after delay
+            setTimeout(() => {
+                currentLevel = 4;
+                showLoader();
+            }, 1500);
+        });
+        
+        // Level 4: Logic Compliance
+        let logicBtnActive = false;
+        let logicBtnGreen = false;
+        const logicBtn = document.getElementById('logicBtn');
+        
+        // Randomly change button state
+        setInterval(() => {
+            if (currentLevel === 4) {
+                logicBtnActive = Math.random() > 0.5;
+                logicBtnGreen = Math.random() > 0.7;
+                
+                if (logicBtnActive && logicBtnGreen) {
+                    logicBtn.style.backgroundColor = '#1a9e2d';
+                    logicBtn.textContent = 'Click Now';
+                    logicBtn.disabled = false;
+                } else if (logicBtnActive && !logicBtnGreen) {
+                    logicBtn.style.backgroundColor = '#0095f6';
+                    logicBtn.textContent = 'Click when ready';
+                    logicBtn.disabled = false;
+                } else {
+                    logicBtn.style.backgroundColor = '#8e8e8e';
+                    logicBtn.textContent = 'Wait...';
+                    logicBtn.disabled = true;
+                }
+            }
+        }, 800);
+        
+        logicBtn.addEventListener('click', function() {
+            if (logicBtnActive && logicBtnGreen) {
+                // Show success message
+                const successMsg = document.getElementById('level4Success');
+                successMsg.style.display = 'block';
+                
+                // Move to next level after delay
+                setTimeout(() => {
+                    currentLevel = 5;
+                    showLoader();
+                }, 1500);
+            } else {
+                // Show error feedback
+                logicBtn.style.backgroundColor = '#ed4956';
+                logicBtn.textContent = 'Incorrect timing!';
+                setTimeout(() => {
+                    logicBtn.style.backgroundColor = '#0095f6';
+                    logicBtn.textContent = 'Click when ready';
+                }, 1000);
+            }
+        });
+        
+        // Level 5: Username Availability Scan
+        const usernameFeedback = document.getElementById('usernameFeedback');
+        const checkUsernameBtn = document.getElementById('checkUsernameBtn');
+        const level5Btn = document.getElementById('level5Btn');
+        const level5Success = document.getElementById('level5Success');
+        let usernameAttempts = 0;
+        const errorMessages = [
+            "Username already taken. Please try another.",
+            "This username is not available. Try a different one.",
+            "Username violates Instagram guidelines.",
+            "Username too similar to an existing account.",
+            "Please choose a more unique username.",
+            "This username is reserved. Try another.",
+            "Username contains invalid characters.",
+            "Username must be at least 5 characters long."
+        ];
+        
+        checkUsernameBtn.addEventListener('click', function() {
+            const username = document.getElementById('username').value.trim();
+            
+            if (username.length < 3) {
+                usernameFeedback.textContent = "Username must be at least 3 characters.";
+                usernameFeedback.className = 'username-feedback username-error';
+                return;
+            }
+            
+            usernameAttempts++;
+            
+            // Always show error messages for the first 5 attempts
+            if (usernameAttempts <= 5) {
+                const randomError = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+                usernameFeedback.textContent = randomError;
+                usernameFeedback.className = 'username-feedback username-error';
+                
+                // After 5 attempts, show the success message and continue button
+                if (usernameAttempts === 5) {
+                    setTimeout(() => {
+                        usernameFeedback.textContent = "";
+                        level5Success.style.display = 'block';
+                        level5Btn.style.display = 'block';
+                    }, 1000);
+                }
+            }
+        });
+        
+        // Move to next level
+        level5Btn.addEventListener('click', function() {
+            currentLevel = 6;
+            showLoader();
+        });
+        
+        // Level 6: Human Behavior Analysis
+        let behaviorBtnClickable = false;
+        const behaviorBtn = document.getElementById('behaviorBtn');
+        const behaviorTimer = document.getElementById('behaviorTimer');
+        const level6Success = document.getElementById('level6Success');
+        
+        // Make button clickable at random intervals
+        function startBehaviorTest() {
+            behaviorBtnClickable = false;
+            behaviorBtn.style.backgroundColor = '#8e8e8e';
+            behaviorBtn.textContent = 'Wait for signal';
+            behaviorTimer.textContent = 'Analyzing readiness... Please wait';
+            
+            // Set a random time between 3-10 seconds when the button becomes clickable
+            const waitTime = 3000 + Math.random() * 7000;
+            
+            setTimeout(() => {
+                behaviorBtnClickable = true;
+                behaviorBtn.style.backgroundColor = '#1a9e2d';
+                behaviorBtn.textContent = 'CLICK NOW!';
+                behaviorTimer.textContent = 'NOW! Click the button!';
+                
+                // If user doesn't click within 1 second, reset
+                setTimeout(() => {
+                    if (behaviorBtnClickable) {
+                        behaviorBtnClickable = false;
+                        behaviorBtn.style.backgroundColor = '#ed4956';
+                        behaviorBtn.textContent = 'Too late!';
+                        behaviorTimer.textContent = 'You missed the window. Try again.';
+                        
+                        setTimeout(startBehaviorTest, 2000);
+                    }
+                }, 1000);
+            }, waitTime);
+        }
+        
+        behaviorBtn.addEventListener('click', function() {
+            if (behaviorBtnClickable) {
+                // Success
+                level6Success.style.display = 'block';
+                behaviorTimer.textContent = 'Human behavior verified successfully!';
+                
+                setTimeout(() => {
+                    currentLevel = 7;
+                    showLoader();
+                }, 2000);
+            } else {
+                // Too early
+                behaviorBtn.style.backgroundColor = '#ed4956';
+                behaviorBtn.textContent = 'Too early!';
+                behaviorTimer.textContent = 'You clicked too early. Try again.';
+                
+                setTimeout(startBehaviorTest, 2000);
+            }
+        });
+        
+        // Start behavior test when level 6 loads
+        setTimeout(startBehaviorTest, 1000);
+        
+        // Level 7: Final Eligibility Lock (Impossible)
+        const loadingTexts = [
+            "Checking account eligibility...",
+            "Verifying identity documents...",
+            "Cross-referencing with existing accounts...",
+            "Analyzing account behavior patterns...",
+            "Finalizing security checks...",
+            "Almost there...",
+            "Final step remaining...",
+            "Syncing with Instagram servers..."
+        ];
+        
+        const statusMessages = [
+            "Session synced with Instagram servers",
+            "Verification in progress...",
+            "Checking compliance with community guidelines",
+            "Processing final approval",
+            "Account verification pending",
+            "Hold on, almost done..."
+        ];
+        
+        let textIndex = 0;
+        let statusIndex = 0;
+        
+        // Cycle through loading texts to create infinite loading illusion
+        function updateLoadingText() {
+            if (currentLevel === 7) {
+                document.getElementById('loadingText').textContent = loadingTexts[textIndex];
+                textIndex = (textIndex + 1) % loadingTexts.length;
+                
+                // Change status message less frequently
+                if (textIndex % 3 === 0) {
+                    document.getElementById('statusMessage').textContent = statusMessages[statusIndex];
+                    statusIndex = (statusIndex + 1) % statusMessages.length;
+                }
+            }
+        }
+        
+        // Start text rotation for level 7
+        setInterval(updateLoadingText, 3000);
+        
+        // Initialize
+        updateProgress(1);
+        
+        // Show random session sync notifications periodically
+        setInterval(() => {
+            if (Math.random() > 0.8 && !cheatDetected) {
+                const sync = document.getElementById('sessionSync');
+                sync.style.display = 'block';
+                setTimeout(() => {
+                    sync.style.display = 'none';
+                }, 2000);
+            }
+        }, 10000);
+    </script>
+</body>
+  </html>
